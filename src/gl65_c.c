@@ -76,13 +76,13 @@ extern char          fbuffer[];  // frame buffer SCREEN_WIDTH * SCREEN_HEIGHT
 
 
 // void initScreenBuffers(){}
-void initScreenBuffers() {
+// void initScreenBuffers() {
 
-    memset(zbuffer, 0xFF, SCREEN_WIDTH * SCREEN_HEIGHT);
+//     memset(zbuffer, 0xFF, SCREEN_WIDTH * SCREEN_HEIGHT);
     
-    memset(fbuffer, 0x20, SCREEN_WIDTH * SCREEN_HEIGHT);  // Space
+//     memset(fbuffer, 0x20, SCREEN_WIDTH * SCREEN_HEIGHT);  // Space
 
-}
+// }
 
 extern unsigned char isFace2BeDrawn;
 extern unsigned char idxPt1, idxPt2, idxPt3;
@@ -1086,22 +1086,22 @@ void glDrawSegments(){
 
 }
 
-void glDrawParticules(){
-    unsigned char ii;
-    unsigned char idxPt;
-    for (ii = 0; ii < nbParticules; ii++) {
-        idxPt    = particulesPt[ii];
-        zplot(
-            (SCREEN_WIDTH -points2aH[idxPt]) >> 1,      // PX
-            (SCREEN_HEIGHT - points2aV[idxPt]) >> 1,    // PY
-            points2dL[idxPt]-2,                         // distance
-            particulesChar[ii]                          // character 2 display
-        );
-    }
-};
+// void glDrawParticules(){
+//     unsigned char ii;
+//     unsigned char idxPt;
+//     for (ii = 0; ii < nbParticules; ii++) {
+//         idxPt    = particulesPt[ii];
+//         zplot(
+//             (SCREEN_WIDTH -points2aH[idxPt]) >> 1,      // PX
+//             (SCREEN_HEIGHT - points2aV[idxPt]) >> 1,    // PY
+//             points2dL[idxPt]-2,                         // distance
+//             particulesChar[ii]                          // character 2 display
+//         );
+//     }
+// };
 
 // void buffer2screen(char * adr_screen){}
 
-void buffer2screen(char destAdr[]) {
-    memcpy(destAdr, fbuffer, SCREEN_HEIGHT* SCREEN_WIDTH);
-}
+// void buffer2screen(char destAdr[]) {
+//     memcpy(destAdr, fbuffer, SCREEN_HEIGHT* SCREEN_WIDTH);
+// }

@@ -6,6 +6,8 @@
 ;;.include "config.inc"
 SCREEN_WIDTH			= 40 
 SCREEN_HEIGHT			= 26
+; .import SCREEN_WIDTH
+; .import SCREEN_HEIGHT
 
 NB_MAX_POINTS			= 64
 NB_MAX_SEGMENTS			= 64
@@ -672,9 +674,9 @@ Ypositiv:
 .segment	"DATA"
 
 _fbuffer:
-	.res	1040,$00
+	.res	SCREEN_WIDTH * SCREEN_WIDTH,$00
 _zbuffer:
-	.res	1040,$00
+	.res	SCREEN_WIDTH * SCREEN_WIDTH,$00
 
 octant_adjust:	.byt %00111111		;; x+,y+,|x|>|y|
 		.byt %00000000		;; x+,y+,|x|<|y|
@@ -828,4 +830,472 @@ tabmult_D:
 	.byt 65, 66, 66, 67, 68, 68, 69, 69
 	.byt 70, 71, 71, 72, 73, 73, 74, 74
 	
-			
+
+
+
+
+;;      _                    _             
+;;   __| |_ __ __ ___      _(_)_ __   __ _ 
+;;  / _` | '__/ _` \ \ /\ / / | '_ \ / _` |
+;; | (_| | | | (_| |\ V  V /| | | | | (_| |
+;;  \__,_|_|  \__,_| \_/\_/ |_|_| |_|\__, |
+;;                                   |___/ 
+
+
+USE_ZBUFFER = 1
+SAFE_CONTEXT = 1
+
+.segment	"DATA"
+_plotX:		.res 1
+_plotY:		.res 1
+
+.export _glDrawParticules
+ 
+.segment    "CODE"
+
+
+
+.proc _fastzplot
+
+.IFDEF SAFE_CONTEXT
+	;; save context
+    pha
+	txa
+	pha
+	tya
+	pha
+	lda tmp1
+	pha
+	lda tmp1+1
+	pha ;; ptrFbuf
+	lda tmp2
+	pha
+	lda tmp2+1
+	pha ;; ptrZbuf
+.ENDIF
+
+;; #ifdef USE_COLOR
+;;    if ((Y <= 0) || (Y >= SCREEN_HEIGHT-NB_LESS_LINES_4_COLOR) || (X <= 2) || (X >= SCREEN_WIDTH))
+;;        return;
+;; #else
+;;    if ((Y <= 0) || (Y >= SCREEN_HEIGHT) || (X <= 0) || (X >= SCREEN_WIDTH))
+;;        return;
+;; #endif
+
+	lda		_plotY
+    beq		fastzplot_done
+    bmi		fastzplot_done
+.IFDEF USE_COLOR
+    cmp		#SCREEN_HEIGHT-NB_LESS_LINES_4_COLOR
+.ELSE
+	cmp		#SCREEN_HEIGHT
+.ENDIF
+    bcs		fastzplot_done
+    tax
+
+	lda		_plotX
+.IFDEF USE_COLOR
+	sec
+	sbc		#COLUMN_OF_COLOR_ATTRIBUTE
+	bvc		*+4
+	eor		#$80
+	bmi		fastzplot_done
+
+	lda		_plotX				; Reload X coordinate
+    cmp		#SCREEN_WIDTH
+    bcs		fastzplot_done
+
+.ELSE
+    beq		fastzplot_done
+    bmi		fastzplot_done
+    cmp		#SCREEN_WIDTH
+    bcs		fastzplot_done
+.ENDIF
+
+    ;; ptrZbuf = zbuffer + Y*SCREEN_WIDTH+X;;
+	lda		ZBufferAdressLow,x	; Get the LOW part of the zbuffer adress
+	clc						; Clear the carry (because we will do an addition after)
+	adc		_plotX				; Add X coordinate
+	sta		tmp2 ; ptrZbuf
+	lda		ZBufferAdressHigh,x	; Get the HIGH part of the zbuffer adress
+	adc		#0					; Eventually add the carry to complete the 16 bits addition
+	sta		tmp2+1	 ; ptrZbuf+ 1			
+
+    ;; if (dist < *ptrZbuf) {
+    lda 	_distpoint		; Access dist
+    ldx		#0
+    cmp		(tmp2,x)
+    bcs		fastzplot_done
+
+    ;;    *ptrZbuf = dist;
+        ldx		#0
+        sta		(tmp2, x)
+    ;;    *ptrFbuf = char2disp;
+        ldx		_plotY    ; reload Y coordinate
+    	lda		FBufferAdressLow,x	; Get the LOW part of the fbuffer adress
+        clc						; Clear the carry (because we will do an addition after)
+        ;;ldy #0
+        adc		_plotX				; Add X coordinate
+        sta		tmp1 ; ptrFbuf
+        lda		FBufferAdressHigh,x	; Get the HIGH part of the fbuffer adress
+        adc		#0					; Eventually add the carry to complete the 16 bits addition
+        sta		tmp1+1	 ; ptrFbuf+ 1			
+
+        lda		_ch2disp		; Access char2disp
+        ldx		#0
+        sta		(tmp1,x)
+
+    ;;}
+
+
+fastzplot_done:
+.IFDEF SAFE_CONTEXT
+	;; restore context
+	pla
+	sta tmp2+1
+	pla
+	sta tmp2
+	pla
+	sta tmp1+1
+	pla
+	sta tmp1
+	pla
+	tay
+	pla
+	tax
+	pla
+.ENDIF
+
+	rts
+.endproc
+
+
+
+;; void glDrawParticules(){
+.proc _glDrawParticules
+
+;;     unsigned char ii = 0;
+.IF .DEFINED(SAFE_CONTEXT)
+    lda tmp1
+	pha 
+.ENDIF ;; SAFE_CONTEXT
+
+    ldy _nbParticules
+    jmp glDrawParticules_nextParticule
+;;     for (ii = 0; ii < nbParticules; ii++) {
+
+glDrawParticules_loop:
+
+;;         idxPt1    = particulesPt[ii];  ;; ii*SIZEOF_SEGMENT +0
+        lda _particulesPt,y
+		sta _idxPt1
+;;         ch2disp = particulesChar[ii];    ;; ii*SIZEOF_SEGMENT +2
+        lda _particulesChar,y
+		sta _ch2disp
+
+        sty tmp1
+		ldy _idxPt1
+;;         dchar = points2dL[idxPt]-2 ; ;;FIXME : -2 to helps particule to be displayed
+        lda _points2dL,y
+		sta _distpoint
+
+;;         P1X = (SCREEN_WIDTH -points2aH[idxPt]) >> 1;
+        sec
+		lda #SCREEN_WIDTH
+		sbc _points2aH,y
+		cmp #$80
+		ror
+        sta _plotX
+        
+;;         P1Y = (SCREEN_HEIGHT - points2aV[idxPt]) >> 1;
+        sec
+		lda #SCREEN_HEIGHT
+		sbc _points2aV,y
+		cmp #$80
+		ror
+        sta _plotY
+
+.IF .DEFINED(USE_ZBUFFER)
+;;         zplot(P1X, P1Y, dchar, ch2disp);
+        jsr _fastzplot
+.ELSE
+;;         ;; TODO : plot a point with no z-buffer
+;;         plot(A1X, A1Y, ch2disp);
+.ENDIF
+        ldy tmp1
+glDrawParticules_nextParticule:
+	dey 
+    bmi glDrawParticules_done
+	jmp glDrawParticules_loop
+;;     }
+
+glDrawParticules_done:
+
+.IF .DEFINED(SAFE_CONTEXT)
+	;; Restore context
+	pla
+	sta tmp1
+.ENDIF ;; SAFE_CONTEXT
+;; }
+
+    rts
+.endproc
+
+
+
+.segment	"DATA"
+
+; This table contains lower 8 bits of the adress
+ZBufferAdressLow:
+	.byt <(_zbuffer+40*0)
+	.byt <(_zbuffer+40*1)
+	.byt <(_zbuffer+40*2)
+	.byt <(_zbuffer+40*3)
+	.byt <(_zbuffer+40*4)
+	.byt <(_zbuffer+40*5)
+	.byt <(_zbuffer+40*6)
+	.byt <(_zbuffer+40*7)
+	.byt <(_zbuffer+40*8)
+	.byt <(_zbuffer+40*9)
+	.byt <(_zbuffer+40*10)
+	.byt <(_zbuffer+40*11)
+	.byt <(_zbuffer+40*12)
+	.byt <(_zbuffer+40*13)
+	.byt <(_zbuffer+40*14)
+	.byt <(_zbuffer+40*15)
+	.byt <(_zbuffer+40*16)
+	.byt <(_zbuffer+40*17)
+	.byt <(_zbuffer+40*18)
+	.byt <(_zbuffer+40*19)
+	.byt <(_zbuffer+40*20)
+	.byt <(_zbuffer+40*21)
+	.byt <(_zbuffer+40*22)
+	.byt <(_zbuffer+40*23)
+	.byt <(_zbuffer+40*24)
+	.byt <(_zbuffer+40*25)
+	.byt <(_zbuffer+40*26)
+	.byt <(_zbuffer+40*27)
+
+; This table contains hight 8 bits of the adress
+ZBufferAdressHigh:
+	.byt >(_zbuffer+40*0)
+	.byt >(_zbuffer+40*1)
+	.byt >(_zbuffer+40*2)
+	.byt >(_zbuffer+40*3)
+	.byt >(_zbuffer+40*4)
+	.byt >(_zbuffer+40*5)
+	.byt >(_zbuffer+40*6)
+	.byt >(_zbuffer+40*7)
+	.byt >(_zbuffer+40*8)
+	.byt >(_zbuffer+40*9)
+	.byt >(_zbuffer+40*10)
+	.byt >(_zbuffer+40*11)
+	.byt >(_zbuffer+40*12)
+	.byt >(_zbuffer+40*13)
+	.byt >(_zbuffer+40*14)
+	.byt >(_zbuffer+40*15)
+	.byt >(_zbuffer+40*16)
+	.byt >(_zbuffer+40*17)
+	.byt >(_zbuffer+40*18)
+	.byt >(_zbuffer+40*19)
+	.byt >(_zbuffer+40*20)
+	.byt >(_zbuffer+40*21)
+	.byt >(_zbuffer+40*22)
+	.byt >(_zbuffer+40*23)
+	.byt >(_zbuffer+40*24)
+	.byt >(_zbuffer+40*25)
+	.byt >(_zbuffer+40*26)
+	.byt >(_zbuffer+40*27)
+
+
+; This table contains lower 8 bits of the adress
+FBufferAdressLow:
+	.byt <(_fbuffer+40*0)
+	.byt <(_fbuffer+40*1)
+	.byt <(_fbuffer+40*2)
+	.byt <(_fbuffer+40*3)
+	.byt <(_fbuffer+40*4)
+	.byt <(_fbuffer+40*5)
+	.byt <(_fbuffer+40*6)
+	.byt <(_fbuffer+40*7)
+	.byt <(_fbuffer+40*8)
+	.byt <(_fbuffer+40*9)
+	.byt <(_fbuffer+40*10)
+	.byt <(_fbuffer+40*11)
+	.byt <(_fbuffer+40*12)
+	.byt <(_fbuffer+40*13)
+	.byt <(_fbuffer+40*14)
+	.byt <(_fbuffer+40*15)
+	.byt <(_fbuffer+40*16)
+	.byt <(_fbuffer+40*17)
+	.byt <(_fbuffer+40*18)
+	.byt <(_fbuffer+40*19)
+	.byt <(_fbuffer+40*20)
+	.byt <(_fbuffer+40*21)
+	.byt <(_fbuffer+40*22)
+	.byt <(_fbuffer+40*23)
+	.byt <(_fbuffer+40*24)
+	.byt <(_fbuffer+40*25)
+	.byt <(_fbuffer+40*26)
+	.byt <(_fbuffer+40*27)
+
+; This table contains hight 8 bits of the adress
+FBufferAdressHigh:
+	.byt >(_fbuffer+40*0)
+	.byt >(_fbuffer+40*1)
+	.byt >(_fbuffer+40*2)
+	.byt >(_fbuffer+40*3)
+	.byt >(_fbuffer+40*4)
+	.byt >(_fbuffer+40*5)
+	.byt >(_fbuffer+40*6)
+	.byt >(_fbuffer+40*7)
+	.byt >(_fbuffer+40*8)
+	.byt >(_fbuffer+40*9)
+	.byt >(_fbuffer+40*10)
+	.byt >(_fbuffer+40*11)
+	.byt >(_fbuffer+40*12)
+	.byt >(_fbuffer+40*13)
+	.byt >(_fbuffer+40*14)
+	.byt >(_fbuffer+40*15)
+	.byt >(_fbuffer+40*16)
+	.byt >(_fbuffer+40*17)
+	.byt >(_fbuffer+40*18)
+	.byt >(_fbuffer+40*19)
+	.byt >(_fbuffer+40*20)
+	.byt >(_fbuffer+40*21)
+	.byt >(_fbuffer+40*22)
+	.byt >(_fbuffer+40*23)
+	.byt >(_fbuffer+40*24)
+	.byt >(_fbuffer+40*25)
+	.byt >(_fbuffer+40*26)
+	.byt >(_fbuffer+40*27)
+
+
+.segment "CODE"
+.export _buffer2screen
+
+ADR_BASE_LORES_SCREEN  = 48040
+
+.proc _buffer2screen
+
+	ldy #$00
+
+buffer2screen_loop_01:
+
+	lda _fbuffer, y 
+	sta ADR_BASE_LORES_SCREEN,y
+	lda _fbuffer+256, y 
+	sta ADR_BASE_LORES_SCREEN+256,y
+	lda _fbuffer+512, y 
+	sta ADR_BASE_LORES_SCREEN+512,y
+	lda _fbuffer+768, y 
+	sta ADR_BASE_LORES_SCREEN+768,y
+	iny
+	bne buffer2screen_loop_01
+
+	ldy #$10
+
+buffer2screen_loop_02:
+
+	lda _fbuffer+1024, y 
+	sta ADR_BASE_LORES_SCREEN+1024,y
+	dey
+	bpl buffer2screen_loop_02
+
+
+    rts
+.endproc
+
+
+.export _initScreenBuffers
+
+;; void initScreenBuffers()
+.proc _initScreenBuffers
+
+  
+    lda #$FF
+    ldx #SCREEN_WIDTH-1
+
+initScreenBuffersLoop_01:
+    sta _zbuffer+SCREEN_WIDTH*0 , x
+    sta _zbuffer+SCREEN_WIDTH*1 , x
+    sta _zbuffer+SCREEN_WIDTH*2 , x
+    sta _zbuffer+SCREEN_WIDTH*3 , x
+    sta _zbuffer+SCREEN_WIDTH*4 , x
+    sta _zbuffer+SCREEN_WIDTH*5 , x
+    sta _zbuffer+SCREEN_WIDTH*6 , x
+    sta _zbuffer+SCREEN_WIDTH*7 , x
+    sta _zbuffer+SCREEN_WIDTH*8 , x
+    sta _zbuffer+SCREEN_WIDTH*9 , x
+    sta _zbuffer+SCREEN_WIDTH*10 , x
+    sta _zbuffer+SCREEN_WIDTH*11 , x
+    sta _zbuffer+SCREEN_WIDTH*12 , x
+    sta _zbuffer+SCREEN_WIDTH*13 , x
+    sta _zbuffer+SCREEN_WIDTH*14 , x
+    sta _zbuffer+SCREEN_WIDTH*15 , x
+    sta _zbuffer+SCREEN_WIDTH*16 , x
+    sta _zbuffer+SCREEN_WIDTH*17 , x
+    sta _zbuffer+SCREEN_WIDTH*18 , x
+    sta _zbuffer+SCREEN_WIDTH*19 , x
+    sta _zbuffer+SCREEN_WIDTH*20 , x
+    sta _zbuffer+SCREEN_WIDTH*21 , x
+    sta _zbuffer+SCREEN_WIDTH*22 , x
+    sta _zbuffer+SCREEN_WIDTH*23 , x
+    sta _zbuffer+SCREEN_WIDTH*24 , x
+    sta _zbuffer+SCREEN_WIDTH*25 , x 
+    sta _zbuffer+SCREEN_WIDTH*26 , x
+    dex
+    bne initScreenBuffersLoop_01
+
+.IFNDEF USE_HORIZON
+    lda #$20
+.ENDIF ;; USE_HORIZON
+
+    ldx #SCREEN_WIDTH-1
+
+initScreenBuffersLoop_02:
+.IFDEF USE_HORIZON
+    lda #$20
+.ENDIF ;; USE_HORIZON
+    sta _fbuffer+SCREEN_WIDTH*0 , x
+    sta _fbuffer+SCREEN_WIDTH*1 , x
+    sta _fbuffer+SCREEN_WIDTH*2 , x
+    sta _fbuffer+SCREEN_WIDTH*3 , x
+    sta _fbuffer+SCREEN_WIDTH*4 , x
+    sta _fbuffer+SCREEN_WIDTH*5 , x
+    sta _fbuffer+SCREEN_WIDTH*6 , x
+    sta _fbuffer+SCREEN_WIDTH*7 , x
+    sta _fbuffer+SCREEN_WIDTH*8 , x
+    sta _fbuffer+SCREEN_WIDTH*9 , x
+    sta _fbuffer+SCREEN_WIDTH*10 , x
+    sta _fbuffer+SCREEN_WIDTH*11 , x
+    sta _fbuffer+SCREEN_WIDTH*12 , x
+    sta _fbuffer+SCREEN_WIDTH*13 , x
+.IFDEF USE_HORIZON
+    lda #102 ;; light green
+.ENDIF ;; USE_HORIZON
+    sta _fbuffer+SCREEN_WIDTH*14 , x
+    sta _fbuffer+SCREEN_WIDTH*15 , x
+    sta _fbuffer+SCREEN_WIDTH*16 , x
+    sta _fbuffer+SCREEN_WIDTH*17 , x
+    sta _fbuffer+SCREEN_WIDTH*18 , x
+    sta _fbuffer+SCREEN_WIDTH*19 , x
+    sta _fbuffer+SCREEN_WIDTH*20 , x
+    sta _fbuffer+SCREEN_WIDTH*21 , x
+.IFNDEF USE_COLOR
+    sta _fbuffer+SCREEN_WIDTH*22 , x
+    sta _fbuffer+SCREEN_WIDTH*23 , x
+    sta _fbuffer+SCREEN_WIDTH*24 , x
+    sta _fbuffer+SCREEN_WIDTH*25 , x
+    sta _fbuffer+SCREEN_WIDTH*26 , x
+.ENDIF
+    dex
+.IFDEF USE_COLOR
+ 	cpx #2
+ 	beq initScreenBuffersDone
+.ENDIF ;; USE_COLOR
+    bpl initScreenBuffersLoop_02
+initScreenBuffersDone:
+
+    rts
+.endproc

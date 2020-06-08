@@ -28,15 +28,21 @@ CONFIG  :=
 # Additional C compiler flags and options.
 # Default: none
 CFLAGS  =
+gl65.telestrat: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
+gl65.atmos: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
 
 # Additional assembler flags and options.
 # Default: none
 ASFLAGS =
+#gl65.telestrat: ASFLAGS +=  -Wa -D SCREEN_WIDTH=40 -Wa -D SCREEN_HEIGHT=26 
+#l65.atmos: ASFLAGS +=
 
 # Additional linker flags and options.
 # Default: none
 LDFLAGS =
 # cc65-Chess.apple2: LDFLAGS += --start-addr 0x4000 -Wl -D -Wl __HIMEM__=0xBF00
+gl65.telestrat: LDFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
+gl65.atmos: LDFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
 
 # Path to the directory containing C and ASM sources.
 # Default: src
