@@ -74,7 +74,7 @@ $(LIBNAME).lib: $(OBJS)
 	$(AR) r $@ $^
 
 $(PROGNAME).tap: $(OBJS) $(PROGNAME).o $(CONTRIBS)
-	$(LD) -t atmos  -o $@ -C atmos/oric.cfg gl65_s.o  gl65_c.o main.o $(CONTRIBS)
+	$(LD) -$(PLATFORM) -o $@ -C atmos/oric.cfg gl65_s.o  gl65_c.o main.o $(CONTRIBS)
 	#cl65 -v -vm -m $(@:.tap=.map) -Ln $(@:.tap=.vice) -g -t$(PLATFORM) $^ -o $@
 	#sed -re 's/al 00(.{4}) \.(.+)$$/\1 \2/' $(@:.tap=.vice) | sort > $(PATH_TO_ORICUTRON)/symbols
 	cp $@ $(PATH_TO_ORICUTRON)

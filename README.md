@@ -29,3 +29,20 @@ then you can test the generated `main.tap` file by executing:
 ```bash
 make testtap
 ```
+
+# Build for Orix
+
+Building gl65 for Orix consists in compiling for `telestrat` target.
+
+In root directory, run the following commands:
+
+```bash
+make TARGETS=telestrat
+cp gl65.telestrat /path/to/Orix/usbdrive/bin/demoGl65
+```
+
+Now you can open your Orix and run the following command:
+
+```bash
+demoGl65
+```
