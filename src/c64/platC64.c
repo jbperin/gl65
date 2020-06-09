@@ -22,8 +22,8 @@
 #define SCREEN_RAM				((char*)VIC_BASE_RAM + 0x2000)
 #define CHARMAP_RAM				((char*)VIC_BASE_RAM + 0x2800)
 
-#define SCREEN_WIDTH            40
-#define SCREEN_HEIGHT           26
+// #define SCREEN_WIDTH            40
+// #define SCREEN_HEIGHT           26
 
 void buffer2screen() {
     memcpy(1024, fbuffer, SCREEN_HEIGHT* SCREEN_WIDTH);

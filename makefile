@@ -28,8 +28,9 @@ CONFIG  :=
 # Additional C compiler flags and options.
 # Default: none
 CFLAGS  =
-#gl65.telestrat: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
-#gl65.atmos: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
+gl65.telestrat: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
+gl65.atmos: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
+gl65.c64: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=25
 
 # Additional assembler flags and options.
 # Default: none

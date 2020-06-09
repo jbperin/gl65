@@ -23,8 +23,8 @@
  *  SCREEN MEMORY //BB80
  */
 #define ADR_BASE_LORES_SCREEN 48040  
-#define SCREEN_WIDTH 40 
-#define SCREEN_HEIGHT 26
+// #define SCREEN_WIDTH 40 
+// #define SCREEN_HEIGHT 26
 
 extern void glProject (char *tabpoint2D, char *tabpoint3D, unsigned char nbPoints, unsigned char opts);
 extern void AdvancedPrint(unsigned char Xpos,unsigned char Ypos, char *message);

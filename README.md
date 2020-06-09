@@ -7,6 +7,7 @@ gl65 is born in order to make [glOric](https://github.com/oric-software/glOric) 
 gl65 is build upon [cc65](https://cc65.github.io/) developpement chain.
 
 
+
 # Build for Oric Atmos
 
 ## First method
@@ -46,3 +47,14 @@ Now you can open your Orix and run the following command:
 ```bash
 demoGl65
 ```
+
+
+# Build for Commodore 64
+
+In root directory, run the following command:
+
+```bash
+make TARGETS=c64 prg
+```
+
+This build a `gl65-c64.prg` that you can open with VICE
