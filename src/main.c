@@ -1,4 +1,11 @@
 
+/*
+ *	main.c
+ *	gl65 3D
+ *
+ *	Created by Jean-Baptiste PERIN, June 2020.
+ *
+ */
 #include <cc65.h>
 #include <conio.h>
 #include <stdbool.h>
@@ -8,6 +15,9 @@
 #include <time.h>
 
 #include "gl65.h"
+
+#include "globals.h"
+#include "plat.h"
 
 /*
  *  SCREEN MEMORY //BB80

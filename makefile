@@ -9,7 +9,7 @@
 
 # Space or comma separated list of cc65 supported target platforms to build for.
 # Default: c64 (lowercase!) c64 c64.chr cx16  c64 apple2 
-TARGETS := atmos 
+TARGETS := c64 atmos telestrat
 
 # Name of the final, single-file executable.
 # Default: name of the current dir with target name appended
@@ -28,21 +28,21 @@ CONFIG  :=
 # Additional C compiler flags and options.
 # Default: none
 CFLAGS  =
-gl65.telestrat: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
-gl65.atmos: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
+#gl65.telestrat: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
+#gl65.atmos: CFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
 
 # Additional assembler flags and options.
 # Default: none
 ASFLAGS =
-#gl65.telestrat: ASFLAGS +=  -Wa -D SCREEN_WIDTH=40 -Wa -D SCREEN_HEIGHT=26 
+#gl65.telestrat: ASFLAGS +=  -Wa -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26 
 #l65.atmos: ASFLAGS +=
 
 # Additional linker flags and options.
 # Default: none
 LDFLAGS =
 # cc65-Chess.apple2: LDFLAGS += --start-addr 0x4000 -Wl -D -Wl __HIMEM__=0xBF00
-gl65.telestrat: LDFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
-gl65.atmos: LDFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
+#gl65.telestrat: LDFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
+#gl65.atmos: LDFLAGS += -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
 
 # Path to the directory containing C and ASM sources.
 # Default: src

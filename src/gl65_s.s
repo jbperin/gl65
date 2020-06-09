@@ -1,13 +1,27 @@
-;---------------------------------------------------------------------------------
-;Fast 3D projection routines by Jean-Baptiste PERIN
-;---------------------------------------------------------------------------------
+;; =======================================
+;; 	       gl65 3D            v1.0
+;; =======================================
+;;   3D graphic library for 6502 platforms 
+;;			
+;;			by Jean-Baptiste PERIN 
+;;
+;;  advised by the great Mickael POINTIER 
+;;                        (a.k.a Dbug)
+;;  for insane optimizations 
+;; =======================================
+;; 
+;; Copyright 2020 Jean-Baptiste PERIN
+;; Email: jbperin@gmail.com
+;;
+;; Website: https://github.com/jbperin/gl65
+;; 
+;; =======================================
 
 
-;;.include "config.inc"
-SCREEN_WIDTH			= 40 
-SCREEN_HEIGHT			= 26
-; .import SCREEN_WIDTH
-; .import SCREEN_HEIGHT
+
+.include "config.inc"
+
+
 
 NB_MAX_POINTS			= 64
 NB_MAX_SEGMENTS			= 64
@@ -384,6 +398,9 @@ glProjectArrays_done:
 
 
 ;---------------------------------------------------------------------------------
+;Fast 3D projection routines by Jean-Baptiste PERIN
+;---------------------------------------------------------------------------------
+;---------------------------------------------------------------------------------
 ;_project
 ;---------------------------------------------------------------------------------
 .export _project
@@ -488,6 +505,9 @@ project_noVAngleOverflow:
     rts
 .endproc
 
+;---------------------------------------------------------------------------------
+;Fast Euclidian Norm calculation by Jean-Baptiste PERIN
+;---------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------
 ;_norm
 ;---------------------------------------------------------------------------------
@@ -1170,41 +1190,6 @@ FBufferAdressHigh:
 	.byt >(_fbuffer+40*26)
 	.byt >(_fbuffer+40*27)
 
-
-.segment "CODE"
-.export _buffer2screen
-
-ADR_BASE_LORES_SCREEN  = 48040
-
-.proc _buffer2screen
-
-	ldy #$00
-
-buffer2screen_loop_01:
-
-	lda _fbuffer, y 
-	sta ADR_BASE_LORES_SCREEN,y
-	lda _fbuffer+256, y 
-	sta ADR_BASE_LORES_SCREEN+256,y
-	lda _fbuffer+512, y 
-	sta ADR_BASE_LORES_SCREEN+512,y
-	lda _fbuffer+768, y 
-	sta ADR_BASE_LORES_SCREEN+768,y
-	iny
-	bne buffer2screen_loop_01
-
-	ldy #$10
-
-buffer2screen_loop_02:
-
-	lda _fbuffer+1024, y 
-	sta ADR_BASE_LORES_SCREEN+1024,y
-	dey
-	bpl buffer2screen_loop_02
-
-
-    rts
-.endproc
 
 
 .export _initScreenBuffers
