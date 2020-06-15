@@ -11,6 +11,6 @@
 
 
 
-extern void buffer2screen();
+extern void glBuffer2Screen();
 
 #endif //_PLAT_H_

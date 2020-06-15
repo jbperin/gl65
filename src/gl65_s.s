@@ -1192,16 +1192,16 @@ FBufferAdressHigh:
 
 
 
-.export _initScreenBuffers
+.export _glInitScreenBuffers
 
-;; void initScreenBuffers()
-.proc _initScreenBuffers
+;; void glInitScreenBuffers()
+.proc _glInitScreenBuffers
 
   
     lda #$FF
     ldx #SCREEN_WIDTH-1
 
-initScreenBuffersLoop_01:
+glInitScreenBuffersLoop_01:
     sta _zbuffer+SCREEN_WIDTH*0 , x
     sta _zbuffer+SCREEN_WIDTH*1 , x
     sta _zbuffer+SCREEN_WIDTH*2 , x
@@ -1230,7 +1230,7 @@ initScreenBuffersLoop_01:
     sta _zbuffer+SCREEN_WIDTH*25 , x 
     sta _zbuffer+SCREEN_WIDTH*26 , x
     dex
-    bne initScreenBuffersLoop_01
+    bne glInitScreenBuffersLoop_01
 
 .IFNDEF USE_HORIZON
     lda #$20
@@ -1238,7 +1238,7 @@ initScreenBuffersLoop_01:
 
     ldx #SCREEN_WIDTH-1
 
-initScreenBuffersLoop_02:
+glInitScreenBuffersLoop_02:
 .IFDEF USE_HORIZON
     lda #$20
 .ENDIF ;; USE_HORIZON
@@ -1277,10 +1277,10 @@ initScreenBuffersLoop_02:
     dex
 .IFDEF USE_COLOR
  	cpx #2
- 	beq initScreenBuffersDone
+ 	beq glInitScreenBuffersDone
 .ENDIF ;; USE_COLOR
-    bpl initScreenBuffersLoop_02
-initScreenBuffersDone:
+    bpl glInitScreenBuffersLoop_02
+glInitScreenBuffersDone:
 
     rts
 .endproc

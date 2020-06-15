@@ -270,7 +270,7 @@ void main (){
         glProjectArrays();
         // // listPoints2D();
 
-        initScreenBuffers();
+        glInitScreenBuffers();
 
         glDrawFaces();
 
@@ -278,7 +278,7 @@ void main (){
 
         glDrawParticules();
 
-        buffer2screen((char *)ADR_BASE_LORES_SCREEN);
+        glBuffer2Screen((char *)ADR_BASE_LORES_SCREEN);
     }
     printf ("Fin\n");
 

@@ -25,6 +25,6 @@
 // #define SCREEN_WIDTH            40
 // #define SCREEN_HEIGHT           26
 
-void buffer2screen() {
+void glBuffer2Screen() {
     memcpy(1024, fbuffer, SCREEN_HEIGHT* SCREEN_WIDTH);
 }

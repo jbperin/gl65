@@ -75,8 +75,8 @@ extern unsigned char zbuffer[];  // z-depth buffer SCREEN_WIDTH * SCREEN_HEIGHT
 extern char          fbuffer[];  // frame buffer SCREEN_WIDTH * SCREEN_HEIGHT
 
 
-// void initScreenBuffers(){}
-// void initScreenBuffers() {
+// void glInitScreenBuffers(){}
+// void glInitScreenBuffers() {
 
 //     memset(zbuffer, 0xFF, SCREEN_WIDTH * SCREEN_HEIGHT);
     
@@ -1100,8 +1100,8 @@ void glDrawSegments(){
 //     }
 // };
 
-// void buffer2screen(char * adr_screen){}
+// void glBuffer2Screen(char * adr_screen){}
 
-// void buffer2screen(char destAdr[]) {
+// void glBuffer2Screen(char destAdr[]) {
 //     memcpy(destAdr, fbuffer, SCREEN_HEIGHT* SCREEN_WIDTH);
 // }
