@@ -371,7 +371,7 @@ glProjectArrays_loop:
 		lda 	_glVerticesZ, y
 		sta		_PointZ
 
-    ;;     projectPoint(x, y, z, options, &ah, &av, &dist);
+    ;;     glProjectPoint(x, y, z, options, &ah, &av, &dist);
 		jsr 	_project 
 
     ;;     points2aH[ii] = ah;
@@ -1036,7 +1036,7 @@ glDrawParticules_loop:
         sta _plotY
 
 .IF .DEFINED(USE_ZBUFFER)
-;;         zplot(P1X, P1Y, dchar, ch2disp);
+;;         glZPlot(P1X, P1Y, dchar, ch2disp);
         jsr _fastzplot
 .ELSE
 ;;         ;; TODO : plot a point with no z-buffer
@@ -1284,3 +1284,15 @@ glInitScreenBuffersDone:
 
     rts
 .endproc
+
+
+
+
+
+; .export _funcName
+
+; ;; void funcName()
+; .proc _funcName
+
+
+; .endproc

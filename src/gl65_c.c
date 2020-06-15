@@ -966,7 +966,7 @@ void glDrawFaces() {
 }
 
 
-void zplot(signed char X,
+void glZPlot(signed char X,
            signed char Y,
            unsigned char dist,
            char          char2disp) {
@@ -1020,7 +1020,7 @@ void lrDrawLine() {
 
     while (1) {  // loop
         // printf ("plot [%d, %d] %d %d\n", A1X, A1Y, distseg, ch2disp);waitkey ();          
-        zplot(A1X, A1Y, distseg, ch2dsp);
+        glZPlot(A1X, A1Y, distseg, ch2dsp);
         if ((A1X == A1destX) && (A1Y == A1destY))
             break;
         //e2 = 2*err;
@@ -1086,22 +1086,24 @@ void glDrawSegments(){
 
 }
 
-// void glDrawParticules(){
-//     unsigned char ii;
-//     unsigned char idxPt;
-//     for (ii = 0; ii < glNbParticles; ii++) {
-//         idxPt    = glParticlesPt[ii];
-//         zplot(
-//             (SCREEN_WIDTH -points2aH[idxPt]) >> 1,      // PX
-//             (SCREEN_HEIGHT - points2aV[idxPt]) >> 1,    // PY
-//             points2dL[idxPt]-2,                         // distance
-//             glParticlesChar[ii]                          // character 2 display
-//         );
-//     }
-// };
+#ifdef USE_C_GLDRAWPARTICLES
+void glDrawParticules(){
+    unsigned char ii;
+    unsigned char idxPt;
+    for (ii = 0; ii < glNbParticles; ii++) {
+        idxPt    = glParticlesPt[ii];
+        glZPlot(
+            (SCREEN_WIDTH -points2aH[idxPt]) >> 1,      // PX
+            (SCREEN_HEIGHT - points2aV[idxPt]) >> 1,    // PY
+            points2dL[idxPt]-2,                         // distance
+            glParticlesChar[ii]                          // character 2 display
+        );
+    }
+};
+#endif
 
-// void glBuffer2Screen(char * adr_screen){}
-
-// void glBuffer2Screen(char destAdr[]) {
-//     memcpy(destAdr, fbuffer, SCREEN_HEIGHT* SCREEN_WIDTH);
-// }
+#ifdef USE_C_GLBUFFER2SCREEN
+void glBuffer2Screen(char destAdr[]) {
+    memcpy(destAdr, fbuffer, SCREEN_HEIGHT* SCREEN_WIDTH);
+}
+#endif

@@ -25,7 +25,7 @@ ARFLAGS=r
 LD=cl65
 #LDFLAGS=-v -vm -g -t$(PLATFORM) 
 LDFLAGS= -t$(PLATFORM) -Cl -O -C atmosc.cfg
-#SRC_ASM= camera.asm temp.asm fill8.asm zbuff.asm hzfill.asm projection.asm projectPoint.asm scene.asm
+#SRC_ASM= camera.asm temp.asm fill8.asm zbuff.asm hzfill.asm projection.asm glProjectPoint.asm scene.asm
 #SRC_C= glOric_c.c
 #OBJS= $(SRC_ASM:.asm=.o) $(SRC_C:.c=.o)
 
