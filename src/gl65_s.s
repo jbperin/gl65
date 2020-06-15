@@ -43,9 +43,9 @@ NB_MAX_FACES            = 64
 .export _CamRotZ, _CamRotX
 .segment    "DATA" 
 ;; Camera Position
-_CamPosX:		.word 0
-_CamPosY:		.word 0
-_CamPosZ:		.word 0
+_CamPosX:		.byte 0
+_CamPosY:		.byte 0
+_CamPosZ:		.byte 0
 
 ;; Camera Orientation
 _CamRotZ:		.byte 0			

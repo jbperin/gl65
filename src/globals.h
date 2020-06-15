@@ -11,13 +11,13 @@
 
 
  // Camera Position use only low bytes
-extern int              CamPosX;
-extern int              CamPosY;
-extern int              CamPosZ;
+extern signed char      CamPosX;
+extern signed char      CamPosY;
+extern signed char      CamPosZ;
 
  // Camera Orientation
-extern char             CamRotZ;  // -128 -> 127 unit : 2PI/(2^8 - 1)
-extern char             CamRotX;
+extern signed char      CamRotZ;  // -128 -> 127 unit : 2PI/(2^8 - 1)
+extern signed char      CamRotX;
 
  // Geometry size
 extern unsigned char    nbPoints;
