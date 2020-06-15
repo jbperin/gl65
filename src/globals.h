@@ -11,36 +11,36 @@
 
 
  // Camera Position use only low bytes
-extern signed char      CamPosX;
-extern signed char      CamPosY;
-extern signed char      CamPosZ;
+extern signed char      glCamPosX;
+extern signed char      glCamPosY;
+extern signed char      glCamPosZ;
 
  // Camera Orientation
-extern signed char      CamRotZ;  // -128 -> 127 unit : 2PI/(2^8 - 1)
-extern signed char      CamRotX;
+extern signed char      glCamRotZ;  // -128 -> 127 unit : 2PI/(2^8 - 1)
+extern signed char      glCamRotX;
 
  // Geometry size
-extern unsigned char    nbPoints;
-extern unsigned char    nbFaces;
-extern unsigned char    nbSegments;
-extern unsigned char    nbParticules;
+extern unsigned char    glNbVertices;
+extern unsigned char    glNbFaces;
+extern unsigned char    glNbSegments;
+extern unsigned char    glNbParticles;
 
  // Geometry buffers
-extern signed char      points3dX[];
-extern signed char      points3dY[];
-extern signed char      points3dZ[];
+extern signed char      glVerticesX[];
+extern signed char      glVerticesY[];
+extern signed char      glVerticesZ[];
 
-extern unsigned char    particulesPt[];
-extern unsigned char    particulesChar[];
+extern unsigned char    glParticlesPt[];
+extern unsigned char    glParticlesChar[];
 
-extern unsigned char    segmentsPt1[];
-extern unsigned char    segmentsPt2[];
-extern unsigned char    segmentsChar[];
+extern unsigned char    glSegmentsPt1[];
+extern unsigned char    glSegmentsPt2[];
+extern unsigned char    glSegmentsChar[];
 
-extern unsigned char    facesPt1[];
-extern unsigned char    facesPt2[];
-extern unsigned char    facesPt3[];
-extern unsigned char    facesChar[];
+extern unsigned char    glFacesPt1[];
+extern unsigned char    glFacesPt2[];
+extern unsigned char    glFacesPt3[];
+extern unsigned char    glFacesChar[];
 
 // Render buffer
 extern char             fbuffer[];  // frame buffer SCREEN_WIDTH * SCREEN_HEIGHT

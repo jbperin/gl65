@@ -37,21 +37,21 @@
 // _\ \   | (__ |  __/| | | ||  __/
 // \__/    \___| \___||_| |_| \___|
 
-extern unsigned char nbSegments;
-extern unsigned char nbFaces;
-extern unsigned char nbParticules;
+extern unsigned char glNbSegments;
+extern unsigned char glNbFaces;
+extern unsigned char glNbParticles;
 
-extern unsigned char segmentsPt1[];
-extern unsigned char segmentsPt2[];
-extern unsigned char segmentsChar[];
+extern unsigned char glSegmentsPt1[];
+extern unsigned char glSegmentsPt2[];
+extern unsigned char glSegmentsChar[];
 
-extern unsigned char particulesPt[];
-extern unsigned char particulesChar[];
+extern unsigned char glParticlesPt[];
+extern unsigned char glParticlesChar[];
 
-extern unsigned char facesPt1[];
-extern unsigned char facesPt2[];
-extern unsigned char facesPt3[];
-extern unsigned char facesChar[];
+extern unsigned char glFacesPt1[];
+extern unsigned char glFacesPt2[];
+extern unsigned char glFacesPt3[];
+extern unsigned char glFacesChar[];
 
 
 //    ___                 _              _    _               
@@ -62,7 +62,7 @@ extern unsigned char facesChar[];
 //                     |__/                                   
 
 extern unsigned char projOptions;
-extern unsigned char nbPoints;
+extern unsigned char glNbVertices;
 
 extern unsigned char points2aH[];
 extern unsigned char points2aV[];
@@ -939,13 +939,13 @@ void retrieveFaceData(){
 void glDrawFaces() {
     unsigned char ii = 0;
 
-    // printf ("%d Points, %d Segments, %d Faces\n", nbPoints, nbSegments, nbFaces); get();
-    for (ii = 0; ii < nbFaces; ii++) {
+    // printf ("%d Points, %d Segments, %d Faces\n", glNbVertices, glNbSegments, glNbFaces); get();
+    for (ii = 0; ii < glNbFaces; ii++) {
 
-        idxPt1 = facesPt1[ii] ;
-        idxPt2 = facesPt2[ii] ;
-        idxPt3 = facesPt3[ii] ;
-        ch2disp = facesChar[ii];
+        idxPt1 = glFacesPt1[ii] ;
+        idxPt2 = glFacesPt2[ii] ;
+        idxPt3 = glFacesPt3[ii] ;
+        ch2disp = glFacesChar[ii];
 
         retrieveFaceData();
 
@@ -1048,11 +1048,11 @@ void lrDrawLine() {
 void glDrawSegments(){
     unsigned char ii = 0;
  
-    for (ii = 0; ii < nbSegments; ii++) {
+    for (ii = 0; ii < glNbSegments; ii++) {
 
-        idxPt1    = segmentsPt1[ii];
-        idxPt2    = segmentsPt2[ii];
-        ch2disp = segmentsChar[ii];
+        idxPt1    = glSegmentsPt1[ii];
+        idxPt2    = glSegmentsPt2[ii];
+        ch2disp = glSegmentsChar[ii];
 
         // dmoy = (d1+d2)/2;
 
@@ -1089,13 +1089,13 @@ void glDrawSegments(){
 // void glDrawParticules(){
 //     unsigned char ii;
 //     unsigned char idxPt;
-//     for (ii = 0; ii < nbParticules; ii++) {
-//         idxPt    = particulesPt[ii];
+//     for (ii = 0; ii < glNbParticles; ii++) {
+//         idxPt    = glParticlesPt[ii];
 //         zplot(
 //             (SCREEN_WIDTH -points2aH[idxPt]) >> 1,      // PX
 //             (SCREEN_HEIGHT - points2aV[idxPt]) >> 1,    // PY
 //             points2dL[idxPt]-2,                         // distance
-//             particulesChar[ii]                          // character 2 display
+//             glParticlesChar[ii]                          // character 2 display
 //         );
 //     }
 // };

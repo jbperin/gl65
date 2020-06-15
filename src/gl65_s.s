@@ -39,17 +39,17 @@ NB_MAX_FACES            = 64
 ;; / /___ | (_| || | | | | ||  __/| |   | (_| |
 ;; \____/  \__,_||_| |_| |_| \___||_|    \__,_|
                                             
-.export _CamPosX, _CamPosY, _CamPosZ
-.export _CamRotZ, _CamRotX
+.export _glCamPosX, _glCamPosY, _glCamPosZ
+.export _glCamRotZ, _glCamRotX
 .segment    "DATA" 
 ;; Camera Position
-_CamPosX:		.byte 0
-_CamPosY:		.byte 0
-_CamPosZ:		.byte 0
+_glCamPosX:		.byte 0
+_glCamPosY:		.byte 0
+_glCamPosZ:		.byte 0
 
 ;; Camera Orientation
-_CamRotZ:		.byte 0			
-_CamRotX:		.byte 0
+_glCamRotZ:		.byte 0			
+_glCamRotX:		.byte 0
 
 
 ;;  __                            
@@ -59,27 +59,27 @@ _CamRotX:		.byte 0
 ;; \__/    \___| \___||_| |_| \___|
 
 
-.export _nbSegments, _nbParticules, _nbFaces
-.export _segmentsPt1, _segmentsPt2, _segmentsChar
-.export _particulesPt, _particulesChar
-.export _facesPt1, _facesPt2, _facesPt3, _facesChar
+.export _glNbSegments, _glNbParticles, _glNbFaces
+.export _glSegmentsPt1, _glSegmentsPt2, _glSegmentsChar
+.export _glParticlesPt, _glParticlesChar
+.export _glFacesPt1, _glFacesPt2, _glFacesPt3, _glFacesChar
 
 
-_nbSegments:         .res 1
-_nbParticules:       .res 1
-_nbFaces:            .res 1
+_glNbSegments:         .res 1
+_glNbParticles:       .res 1
+_glNbFaces:            .res 1
 
-_segmentsPt1:        .res NB_MAX_SEGMENTS
-_segmentsPt2:        .res NB_MAX_SEGMENTS
-_segmentsChar:       .res NB_MAX_SEGMENTS
+_glSegmentsPt1:        .res NB_MAX_SEGMENTS
+_glSegmentsPt2:        .res NB_MAX_SEGMENTS
+_glSegmentsChar:       .res NB_MAX_SEGMENTS
 
-_particulesPt:       .res NB_MAX_PARTICULES
-_particulesChar:     .res NB_MAX_PARTICULES
+_glParticlesPt:       .res NB_MAX_PARTICULES
+_glParticlesChar:     .res NB_MAX_PARTICULES
 
-_facesPt1:           .res NB_MAX_FACES
-_facesPt2:           .res NB_MAX_FACES
-_facesPt3:           .res NB_MAX_FACES
-_facesChar:          .res NB_MAX_FACES
+_glFacesPt1:           .res NB_MAX_FACES
+_glFacesPt2:           .res NB_MAX_FACES
+_glFacesPt3:           .res NB_MAX_FACES
+_glFacesChar:          .res NB_MAX_FACES
 
 ;;    ___                 _              _    _               
 ;;   / _ \ _ __   ___    (_)  ___   ___ | |_ (_)  ___   _ __  
@@ -88,16 +88,16 @@ _facesChar:          .res NB_MAX_FACES
 ;; \/     |_|    \___/  _/ | \___| \___| \__||_| \___/ |_| |_|
 ;;                     |__/                                   
 
-.export _projOptions, _nbPoints
-.export _points3dX, _points3dY, _points3dZ, _points2aH, _points2aV, _points2dH, _points2dL
+.export _projOptions, _glNbVertices
+.export _glVerticesX, _glVerticesY, _glVerticesZ, _points2aH, _points2aV, _points2dH, _points2dL
 
 
 _projOptions:        .res 1
-_nbPoints:           .res 1
+_glNbVertices:           .res 1
 
-_points3dX:          .res NB_MAX_POINTS
-_points3dY:          .res NB_MAX_POINTS
-_points3dZ:          .res NB_MAX_POINTS
+_glVerticesX:          .res NB_MAX_POINTS
+_glVerticesY:          .res NB_MAX_POINTS
+_glVerticesZ:          .res NB_MAX_POINTS
 
 _points2aH:          .res NB_MAX_POINTS
 _points2aV:          .res NB_MAX_POINTS
@@ -233,7 +233,7 @@ _hLineLength: .byte 0
 
 ptrpt3 		:= ptr3
 ptrpt2 		:= ptr2
-;;nbPoints 	:= tmp1
+;;glNbVertices 	:= tmp1
 ;;opts 		:= tmp1
 _res		:= tmp2
 _tx		:= tmp3
@@ -243,7 +243,7 @@ _ty		:= tmp4
 .segment "CODE"
 
 ;---------------------------------------------------------------------------------
-;void glProject (char *tabpoint2D, char *tabpoint3D, unsigned char nbPoints, unsigned char opts);
+;void glProject (char *tabpoint2D, char *tabpoint3D, unsigned char glNbVertices, unsigned char opts);
 ;---------------------------------------------------------------------------------
 
 .export _glProject
@@ -251,7 +251,7 @@ _ty		:= tmp4
 .proc _glProject
 	;;sta tmp1		;opts
 	jsr popa
-	sta _nbPoints		;nbPoints
+	sta _glNbVertices		;glNbVertices
 	jsr popax		;get tabpoint3D
 	sta ptrpt3
 	stx ptrpt3+1
@@ -259,18 +259,18 @@ _ty		:= tmp4
 	sta ptrpt2
 	stx ptrpt2+1
 
-    ldx _nbPoints		;nbPoints
+    ldx _glNbVertices		;glNbVertices
     dex
-    txa ; ii = nbPoints - 1
+    txa ; ii = glNbVertices - 1
     asl
     asl ; ii * SIZEOF_3DPOINT (4)
     clc
     adc #$03
     tay
     
-    ldx _nbPoints		;nbPoints
+    ldx _glNbVertices		;glNbVertices
     dex
-    txa ; ii = nbPoints - 1
+    txa ; ii = glNbVertices - 1
     asl
     asl ; ii * SIZEOF_2DPOINT (4)
     clc
@@ -356,19 +356,19 @@ dofastprojdone:
 
 .proc _glProjectArrays
 
-    ;; for (ii = 0; ii < nbPoints; ii++){
-	ldy		_nbPoints
+    ;; for (ii = 0; ii < glNbVertices; ii++){
+	ldy		_glNbVertices
 glProjectArrays_loop:
 	dey
 	bmi		glProjectArrays_done
-		;;     x = points3dX[ii];
-		lda 	_points3dX, y
+		;;     x = glVerticesX[ii];
+		lda 	_glVerticesX, y
 		sta		_PointX
-		;;     y = points3dY[ii];
-		lda 	_points3dY, y
+		;;     y = glVerticesY[ii];
+		lda 	_glVerticesY, y
 		sta		_PointY
-		;;     z = points3dZ[ii];
-		lda 	_points3dZ, y
+		;;     z = glVerticesZ[ii];
+		lda 	_glVerticesZ, y
 		sta		_PointZ
 
     ;;     projectPoint(x, y, z, options, &ah, &av, &dist);
@@ -416,27 +416,27 @@ glProjectArrays_done:
     sta HAngleOverflow
     sta VAngleOverflow
 
-	;; DeltaX = CamPosX - PointX
+	;; DeltaX = glCamPosX - PointX
 	;; Divisor = DeltaX
 	sec
 	lda _PointX
-	sbc _CamPosX
+	sbc _glCamPosX
 	sta _DeltaX
 	sta _tx
 	;; FOR 16 bits Coords
 	;; lda _PointX+1
-	;; sbc _CamPosX+1
+	;; sbc _glCamPosX+1
 	;; sta _DeltaX+1
 
-	;; DeltaY = CamPosY - PointY
+	;; DeltaY = glCamPosY - PointY
 	sec
 	lda _PointY
-	sbc _CamPosY
+	sbc _glCamPosY
 	sta _DeltaY
 	sta _ty
 	;; FOR 16 bits Coords
 	;; lda _PointY+1
-	;; sbc _CamPosY+1
+	;; sbc _glCamPosY+1
 	;; sta _DeltaY+1
 
     ;; AngleH = atan2 (DeltaY, DeltaX)
@@ -451,14 +451,14 @@ glProjectArrays_done:
     ;; Norm = norm (DeltaX, DeltaY)
     jsr _norm_8
 
-   	;; DeltaZ = CamPosZ - PointZ
+   	;; DeltaZ = glCamPosZ - PointZ
 	sec
 	lda _PointZ
-	sbc _CamPosZ
+	sbc _glCamPosZ
 	sta _DeltaZ
 	;; FOR 16 bits Coords
 	;; lda _PointZ+1
-	;; sbc _CamPosZ+1
+	;; sbc _glCamPosZ+1
 	;; sta _DeltaZ+1
 
     ;; AngleV = atan2 (DeltaZ, Norm)
@@ -470,20 +470,20 @@ glProjectArrays_done:
     lda _res
     sta _AngleV
 
-    ;; AnglePH = AngleH - CamRotZ
+    ;; AnglePH = AngleH - glCamRotZ
     sec
     lda _AngleH
-    sbc _CamRotZ
+    sbc _glCamRotZ
     sta AnglePH
     bvc project_noHAngleOverflow
     lda #$80
     sta HAngleOverflow
 
 project_noHAngleOverflow:
-    ;; AnglePV = AngleV - CamRotX
+    ;; AnglePV = AngleV - glCamRotX
     sec
     lda _AngleV
-    sbc _CamRotX
+    sbc _glCamRotX
     sta AnglePV
     bvc project_noVAngleOverflow
     lda #$80
@@ -1000,17 +1000,17 @@ fastzplot_done:
 	pha 
 .ENDIF ;; SAFE_CONTEXT
 
-    ldy _nbParticules
+    ldy _glNbParticles
     jmp glDrawParticules_nextParticule
-;;     for (ii = 0; ii < nbParticules; ii++) {
+;;     for (ii = 0; ii < glNbParticles; ii++) {
 
 glDrawParticules_loop:
 
-;;         idxPt1    = particulesPt[ii];  ;; ii*SIZEOF_SEGMENT +0
-        lda _particulesPt,y
+;;         idxPt1    = glParticlesPt[ii];  ;; ii*SIZEOF_SEGMENT +0
+        lda _glParticlesPt,y
 		sta _idxPt1
-;;         ch2disp = particulesChar[ii];    ;; ii*SIZEOF_SEGMENT +2
-        lda _particulesChar,y
+;;         ch2disp = glParticlesChar[ii];    ;; ii*SIZEOF_SEGMENT +2
+        lda _glParticlesChar,y
 		sta _ch2disp
 
         sty tmp1

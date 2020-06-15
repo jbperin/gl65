@@ -26,7 +26,7 @@
 // #define SCREEN_WIDTH 40 
 // #define SCREEN_HEIGHT 26
 
-extern void glProject (char *tabpoint2D, char *tabpoint3D, unsigned char nbPoints, unsigned char opts);
+extern void glProject (char *tabpoint2D, char *tabpoint3D, unsigned char glNbVertices, unsigned char opts);
 extern void AdvancedPrint(unsigned char Xpos,unsigned char Ypos, char *message);
 extern void project ();
 
@@ -190,34 +190,34 @@ void addGeom2(
     npart = geom[kk++];
     for (ii = 0; ii < npt; ii++){
         if (orientation == 0) {
-            points3dX[nbPoints] = X + sizeX * geom[kk++];
-            points3dY[nbPoints] = Y + sizeY * geom[kk++];
+            glVerticesX[glNbVertices] = X + sizeX * geom[kk++];
+            glVerticesY[glNbVertices] = Y + sizeY * geom[kk++];
         } else {
-            points3dY[nbPoints] = X + sizeY * geom[kk++];
-            points3dX[nbPoints] = Y + sizeX * geom[kk++];
+            glVerticesY[glNbVertices] = X + sizeY * geom[kk++];
+            glVerticesX[glNbVertices] = Y + sizeX * geom[kk++];
         }
-        points3dZ[nbPoints] = Z + sizeZ * geom[kk++];
-        nbPoints ++;
+        glVerticesZ[glNbVertices] = Z + sizeZ * geom[kk++];
+        glNbVertices ++;
         kk++; // skip unused byte
     }
     for (ii = 0; ii < nfa; ii++){
-        facesPt1[nbFaces] = nbPoints - (npt-geom[kk++]);  // Index Point 1
-        facesPt2[nbFaces] = nbPoints - (npt-geom[kk++]);  // Index Point 2
-        facesPt3[nbFaces] = nbPoints - (npt-geom[kk++]);  // Index Point 3
-        facesChar[nbFaces] = geom[kk++];  // Character
-        nbFaces++;
+        glFacesPt1[glNbFaces] = glNbVertices - (npt-geom[kk++]);  // Index Point 1
+        glFacesPt2[glNbFaces] = glNbVertices - (npt-geom[kk++]);  // Index Point 2
+        glFacesPt3[glNbFaces] = glNbVertices - (npt-geom[kk++]);  // Index Point 3
+        glFacesChar[glNbFaces] = geom[kk++];  // Character
+        glNbFaces++;
     }
     for (ii = 0; ii < nseg; ii++){
-        segmentsPt1[nbSegments] = nbPoints - (npt-geom[kk++]);  // Index Point 1
-        segmentsPt2[nbSegments] = nbPoints - (npt-geom[kk++]);  // Index Point 2
-        segmentsChar[nbSegments] = geom[kk++]; // Character
-        nbSegments++;
+        glSegmentsPt1[glNbSegments] = glNbVertices - (npt-geom[kk++]);  // Index Point 1
+        glSegmentsPt2[glNbSegments] = glNbVertices - (npt-geom[kk++]);  // Index Point 2
+        glSegmentsChar[glNbSegments] = geom[kk++]; // Character
+        glNbSegments++;
         kk++; // skip unused byte
     }
     for (ii = 0; ii < npart; ii++){
-        particulesPt[nbParticules] = nbPoints - (npt-geom[kk++]);  // Index Point
-        particulesChar[nbParticules] = geom[kk++]; // Character
-        nbParticules++;        
+        glParticlesPt[glNbParticles] = glNbVertices - (npt-geom[kk++]);  // Index Point
+        glParticlesChar[glNbParticles] = geom[kk++]; // Character
+        glNbParticles++;        
     }
 }    
 
@@ -228,10 +228,10 @@ void init (){
     // printf ("coucou \n");
 
     
-    nbPoints     = 0;
-    nbSegments   = 0;
-    nbFaces      = 0;
-    nbParticules = 0;
+    glNbVertices     = 0;
+    glNbSegments   = 0;
+    glNbFaces      = 0;
+    glNbParticles = 0;
 
     change_char(36, 0x80, 0x40, 020, 0x10, 0x08, 0x04, 0x02, 0x01);
     addGeom2(0, 0, 0, 12, 8, 4, 0, geomHouse);
@@ -246,24 +246,24 @@ extern void glProjectArrays();
 void main (){
 
     int i, j;
-    CamPosX = -20;
-    CamPosY = 16;
-    CamPosZ = 6;
+    glCamPosX = -20;
+    glCamPosY = 16;
+    glCamPosZ = 6;
 
-    CamRotZ = -23;
-    CamRotX = 0;
+    glCamRotZ = -23;
+    glCamRotX = 0;
 
     init ();
 
     i = 0;
     for (j = 0; j < 64; j++) {
-        CamPosX = traj[i++];
-        CamPosY = traj[i++];
-        CamRotZ = traj[i++];
+        glCamPosX = traj[i++];
+        glCamPosY = traj[i++];
+        glCamRotZ = traj[i++];
         i       = i % (NB_POINTS_TRAJ * SIZE_POINTS_TRAJ);
 
 //     snprintf(tampon, 256, "j = %d coord = [%d, %d, %d]"
-//             , j, CamPosX, CamPosY, CamRotZ );
+//             , j, glCamPosX, glCamPosY, glCamRotZ );
 
 //     AdvancedPrint(j%26, 0 ,tampon);
 
