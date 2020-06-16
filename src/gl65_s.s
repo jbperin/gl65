@@ -1288,6 +1288,38 @@ glInitScreenBuffersDone:
 
 
 
+;;            _       _   
+;;  _____ __ | | ___ | |_ 
+;; |_  / '_ \| |/ _ \| __|
+;;  / /| |_) | | (_) | |_ 
+;; /___| .__/|_|\___/ \__|
+;;     |_|                
+
+
+.export _glZPlot
+
+;; void glZPlot(signed char X,
+;;           signed char Y,
+;;           unsigned char dist,
+;;           char          char2disp) {
+
+.proc _glZPlot
+
+	sta _ch2disp		; Access char2disp
+	jsr popa
+	sta _distpoint		; Access dist
+	jsr popa
+	sta _plotY			; Access Y coordinate
+	jsr popa
+	sta _plotX			; Access X coordinate
+
+	jsr 	_fastzplot
+
+zplot_done:
+    rts
+.endproc
+
+
 
 ; .export _funcName
 

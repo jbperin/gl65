@@ -966,6 +966,8 @@ void glDrawFaces() {
 }
 
 
+// #define USE_C_GLZPLOT
+#ifdef USE_C_GLZPLOT
 void glZPlot(signed char X,
            signed char Y,
            unsigned char dist,
@@ -992,6 +994,7 @@ void glZPlot(signed char X,
         *ptrZbuf = dist;
     }
 }
+#endif // USE_C_GLZPLOT
 
 
 void lrDrawLine() {
@@ -1019,7 +1022,7 @@ void lrDrawLine() {
     }
 
     while (1) {  // loop
-        // printf ("plot [%d, %d] %d %d\n", A1X, A1Y, distseg, ch2disp);waitkey ();          
+        // printf ("plot [%d, %d] %d %d\n", A1X, A1Y, distseg, ch2disp); cgetc ();          
         glZPlot(A1X, A1Y, distseg, ch2dsp);
         if ((A1X == A1destX) && (A1Y == A1destY))
             break;
