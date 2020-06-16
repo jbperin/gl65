@@ -677,16 +677,16 @@ Ypositiv:
     rts
 .endproc
 
-;---------------------------------------------------------------------------------
-;une fonction
-;---------------------------------------------------------------------------------
+; ;---------------------------------------------------------------------------------
+; ;une fonction
+; ;---------------------------------------------------------------------------------
 
-.export _une_fonction
+; .export _une_fonction
  
-.proc _une_fonction
-	lda #SCREEN_WIDTH
-    rts
-.endproc
+; .proc _une_fonction
+; 	lda #SCREEN_WIDTH
+;     rts
+; .endproc
 
 .export		_fbuffer
 .export		_zbuffer
@@ -990,7 +990,7 @@ fastzplot_done:
 .endproc
 
 
-
+.segment "CODE"
 ;; void glDrawParticules(){
 .proc _glDrawParticules
 
@@ -1190,7 +1190,7 @@ FBufferAdressHigh:
 	.byt >(_fbuffer+40*26)
 	.byt >(_fbuffer+40*27)
 
-
+.segment "CODE"
 
 .export _glInitScreenBuffers
 
@@ -1295,7 +1295,7 @@ glInitScreenBuffersDone:
 ;; /___| .__/|_|\___/ \__|
 ;;     |_|                
 
-
+.segment "CODE"
 .export _glZPlot
 
 ;; void glZPlot(signed char X,
@@ -1320,7 +1320,184 @@ zplot_done:
 .endproc
 
 
+; USE_ASM_ANGLE2SCREEN = 1
 
+.IFDEF USE_ASM_ANGLE2SCREEN
+.segment "CODE"
+.export _angle2screen
+;; void angle2screen() {
+.proc _angle2screen
+
+
+.IFDEF SAFE_CONTEXT
+    ;; save context
+    pha
+.ENDIF ;; SAFE_CONTEXT
+
+    ;; FIXME : deal with case of overflow
+    ;;     P1X = (SCREEN_WIDTH - P1AH) >> 1;
+    sec
+	lda #SCREEN_WIDTH
+	sbc _P1AH
+	cmp #$80
+	ror
+	sta _P1X
+    ;;     P1Y = (SCREEN_HEIGHT - P1AV) >> 1;
+    sec
+	lda #SCREEN_HEIGHT
+	sbc _P1AV
+	cmp #$80
+	ror
+	sta _P1Y
+    ;;     P2X = (SCREEN_WIDTH - P2AH) >> 1;
+    sec
+	lda #SCREEN_WIDTH
+	sbc _P2AH
+	cmp #$80
+	ror
+	sta _P2X
+    ;;     P2Y = (SCREEN_HEIGHT - P2AV) >> 1;
+    sec
+	lda #SCREEN_HEIGHT
+	sbc _P2AV
+	cmp #$80
+	ror
+	sta _P2Y
+    ;;     P3X = (SCREEN_WIDTH - P3AH) >> 1;
+    sec
+	lda #SCREEN_WIDTH
+	sbc _P3AH
+	cmp #$80
+	ror
+	sta _P3X
+    ;;     P3Y = (SCREEN_HEIGHT - P3AV) >> 1;
+    sec
+	lda #SCREEN_HEIGHT
+	sbc _P3AV
+	cmp #$80
+	ror
+	sta _P3Y
+
+
+.IFDEF SAFE_CONTEXT
+    ;; restore context
+    pla
+.ENDIF ;; SAFE_CONTEXT
+    ;; }
+
+	rts
+ .endproc
+
+.ENDIF ;; USE_ASM_ANGLE2SCREEN
+
+
+
+
+
+USE_ASM_RETRIEVEFACEDATA = 1
+.IFDEF USE_ASM_RETRIEVEFACEDATA
+.export _retrieveFaceData
+
+;; void retrieveFaceData()
+.proc _retrieveFaceData
+
+	ldy _idxPt1
+        ;; P1AH = points2aH[idxPt1];
+	lda _points2aH,y
+	sta _P1AH 
+        ;; P1AV = points2aV[idxPt1];
+	lda _points2aV,y
+	sta _P1AV 
+        ;; dmoy = points2dL[idxPt1]; ;;*((int*)(points2d + offPt1 + 2));
+	lda _points2dL,y
+	sta _dmoy
+	lda _points2dH,y
+	sta _dmoy+1
+
+	ldy _idxPt2
+        ;; P2AH = points2aH[idxPt2];
+	lda _points2aH,y
+	sta _P2AH 		
+        ;; P2AV = points2aV[idxPt2];
+	lda _points2aV,y
+	sta _P2AV 		
+        ;; dmoy += points2dL[idxPt2]; ;;*((int*)(points2d + offPt2 + 2));
+	clc
+	lda _points2dL,y
+	adc _dmoy
+	sta _dmoy
+	lda _points2dH,y
+	adc _dmoy+1
+	sta _dmoy+1
+
+
+    ldy _idxPt3
+	    ;; P3AH = points2aH[idxPt3];
+	lda _points2aH,y
+	sta _P3AH	
+        ;; P3AV = points2aV[idxPt3];
+	lda _points2aV,y
+	sta _P3AV 		
+        ;; dmoy +=  points2dL[idxPt3]; ;;*((int*)(points2d + offPt3 + 2));
+	clc
+	lda _points2dL,y
+	adc _dmoy
+	sta _dmoy
+	lda _points2dH,y
+	adc _dmoy+1
+	sta _dmoy+1
+
+	lda _dmoy+1
+	
+	beq moynottoobig		;; FIXME :: it should be possible to deal with case *(dmoy+1) = 1
+	lda #$FF
+	sta _distface
+	jmp retreiveFaceData_done
+
+moynottoobig:
+        ;; dmoy = dmoy / 3;
+	lda _dmoy
+
+	;Divide by 3 found on http://forums.nesdev.com/viewtopic.php?f=2&t=11336
+	;18 bytes, 30 cycles
+	sta  tmp1
+	lsr
+	adc  #21
+	lsr
+	adc  tmp1
+	ror
+	lsr
+	adc  tmp1
+	ror
+	lsr
+	adc  tmp1
+	ror
+	lsr
+
+        ;; if (dmoy >= 256) {
+        ;;     dmoy = 256;
+        ;; }
+        ;; distface = (unsigned char)(dmoy & 0x00FF);
+	sta _distface
+
+
+retreiveFaceData_done:	
+	;; restore context
+	; pla: sta tmp1
+	; pla: sta tmp0
+	; pla: sta reg0
+	;pla
+
+	; jmp leave :
+
+	rts
+
+.endproc
+.ENDIF ;; USE_ASM_RETRIEVEFACEDATA
+
+
+
+; .IFDEF USE_ASM_FUNCNAME
 ; .export _funcName
 
 ; ;; void funcName()
@@ -1328,3 +1505,4 @@ zplot_done:
 
 
 ; .endproc
+; .ENDIF ;; funcName

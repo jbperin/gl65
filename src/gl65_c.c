@@ -693,6 +693,9 @@ void prepare_bresrun() {
         }
     }
 }
+
+#define USE_C_ANGLE2SCREEN
+#ifdef USE_C_ANGLE2SCREEN
 void angle2screen() {
     P1X = (SCREEN_WIDTH - P1AH) >> 1;
     P1Y = (SCREEN_HEIGHT - P1AV) >> 1;
@@ -701,6 +704,11 @@ void angle2screen() {
     P3X = (SCREEN_WIDTH - P3AH) >> 1;
     P3Y = (SCREEN_HEIGHT - P3AV) >> 1;
 }
+#else
+extern void angle2screen();
+#endif // USE_C_ANGLE2SCREEN
+
+
 void fill8() {
 
     prepare_bresrun();
@@ -910,6 +918,8 @@ void sortPoints(){
         P3AV = tmpV;
     }
 }
+
+#ifdef USE_C_RETRIEVEFACEDATA
 void retrieveFaceData(){
 
         // printf ("face %d : %d %d %d\n",ii, idxPt1, idxPt2, idxPt3);get();
@@ -935,6 +945,9 @@ void retrieveFaceData(){
         // printf ("disface %d %d\n",dmoy, distface);get();
 
 }
+#else
+extern void retrieveFaceData();
+#endif // USE_C_RETRIEVEFACEDATA
 
 void glDrawFaces() {
     unsigned char ii = 0;
