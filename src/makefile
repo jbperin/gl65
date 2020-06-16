@@ -14,10 +14,10 @@ PLATFORM=atmos
 XA=$(OSDK)/xa.exe
 
 AS=ca65	
-ASFLAGS=-t$(PLATFORM) -g --include-dir .
+ASFLAGS=-t$(PLATFORM) -g --include-dir . -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
 
 CC=cc65
-CFLAGS= -g 
+CFLAGS= -g -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26
 
 AR=ar65
 ARFLAGS=r
@@ -41,7 +41,7 @@ CONTRIBS= atmos/print.o atmos/platOric.o
 #	$(CC) $(CFLAGS) $^ -o $@
 
 %.o: %.c
-	$(LD) -t$(PLATFORM) -c --create-dep $(@:.o=.d) -Oris -o $@ $^
+	$(LD) -t$(PLATFORM) -c --create-dep $(@:.o=.d) -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26 -g -Oris -o $@ $^
 	
 #%.o: %.c
 #	$(CC) $(CFLAGS) $^ -o $@
@@ -74,9 +74,9 @@ $(LIBNAME).lib: $(OBJS)
 	$(AR) r $@ $^
 
 $(PROGNAME).tap: $(OBJS) $(PROGNAME).o $(CONTRIBS)
-	$(LD) -$(PLATFORM) -o $@ -C atmos/oric.cfg gl65_s.o  gl65_c.o main.o $(CONTRIBS)
+	$(LD) -v -vm -m main.map -Ln main.vice -g -t$(PLATFORM) -o $@ -C atmos/atmos.cfg gl65_s.o  gl65_c.o main.o $(CONTRIBS)
 	#cl65 -v -vm -m $(@:.tap=.map) -Ln $(@:.tap=.vice) -g -t$(PLATFORM) $^ -o $@
-	#sed -re 's/al 00(.{4}) \.(.+)$$/\1 \2/' $(@:.tap=.vice) | sort > $(PATH_TO_ORICUTRON)/symbols
+	sed -re 's/al 00(.{4}) \.(.+)$$/\1 \2/' main.vice | sort > $(PATH_TO_ORICUTRON)/symbols
 	cp $@ $(PATH_TO_ORICUTRON)
 
 $(PROGNAME).dsk: $(PROGNAME).o $(OBJS) $(CONTRIBS)
