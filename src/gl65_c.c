@@ -644,6 +644,8 @@ void isA1Right3 (){
  A1Right = (A1X > A2X);
 }
 
+// #define USE_C_PREPAREBRESRUN
+#ifdef USE_C_PREPAREBRESRUN
 void prepare_bresrun() {
     if (P1Y <= P2Y) {
         if (P2Y <= P3Y) {
@@ -693,6 +695,9 @@ void prepare_bresrun() {
         }
     }
 }
+#else
+extern void prepare_bresrun();
+#endif // USE_C_PREPAREBRESRUN
 
 #define USE_C_ANGLE2SCREEN
 #ifdef USE_C_ANGLE2SCREEN
