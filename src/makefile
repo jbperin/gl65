@@ -37,8 +37,8 @@ CONTRIBS= atmos/print.o atmos/platOric.o
 	$(LD) -t$(PLATFORM) -c --create-dep $(@:.o=.d) -o $@ $^
 	#$(AS) $(ASFLAGS) $^ -l $(@:.o=.lst) -o $@
 
-#%.s: %.c
-#	$(CC) $(CFLAGS) $^ -o $@
+%.s: %.c
+	$(CC) $(CFLAGS) $^ -o $@
 
 %.o: %.c
 	$(LD) -t$(PLATFORM) -c --create-dep $(@:.o=.d) -D SCREEN_WIDTH=40 -D SCREEN_HEIGHT=26 -g -Oris -o $@ $^
