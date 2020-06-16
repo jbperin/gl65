@@ -236,7 +236,6 @@ void init (){
     change_char(36, 0x80, 0x40, 020, 0x10, 0x08, 0x04, 0x02, 0x01);
     addGeom2(0, 0, 0, 12, 8, 4, 0, geomHouse);
 
-    glZPlot (10, 10, 12, 'H');
 }
 
 
@@ -255,11 +254,10 @@ void main (){
     glCamRotX = 0;
 
     init ();
-    cgetc();
 
     i = 0;
     for (j = 0; j < 64; j++) {
-        printf ("coucou\n");
+        
         glCamPosX = traj[i++];
         glCamPosY = traj[i++];
         glCamRotZ = traj[i++];
@@ -281,7 +279,7 @@ void main (){
 
         glDrawParticules();
 
-        glBuffer2Screen((char *)ADR_BASE_LORES_SCREEN);
+        glBuffer2Screen();
     }
     printf ("Fin\n");
 

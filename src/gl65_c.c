@@ -1106,7 +1106,7 @@ void glDrawParticules(){
 #endif
 
 #ifdef USE_C_GLBUFFER2SCREEN
-void glBuffer2Screen(char destAdr[]) {
-    memcpy(destAdr, fbuffer, SCREEN_HEIGHT* SCREEN_WIDTH);
+void glBuffer2Screen() {
+    memcpy((void*)ADR_BASE_LORES_SCREEN, fbuffer, SCREEN_HEIGHT* SCREEN_WIDTH);
 }
 #endif
