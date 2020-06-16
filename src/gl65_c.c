@@ -891,6 +891,9 @@ void guessIfFace2BeDrawn () {
         // _1_ nothing to do
     }
 }
+
+
+#ifdef USE_C_SORTPOINTS
 void sortPoints(){
     signed char   tmpH, tmpV;
     if (abs(P2AH) < abs(P1AH)) {
@@ -918,6 +921,9 @@ void sortPoints(){
         P3AV = tmpV;
     }
 }
+#else
+extern void sortPoints();
+#endif
 
 #ifdef USE_C_RETRIEVEFACEDATA
 void retrieveFaceData(){

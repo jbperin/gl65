@@ -1497,6 +1497,173 @@ retreiveFaceData_done:
 
 
 
+
+USE_ASM_SORTPOINTS=1
+.IFDEF USE_ASM_SORTPOINTS
+.export _sortPoints
+
+;; void sortPoints()
+.proc _sortPoints
+
+
+
+.IFDEF SAFE_CONTEXT
+	;; save context
+    pha
+	lda tmp1
+	pha
+	lda ptr1
+	pha ; tmpH
+	lda ptr1+1
+	pha ; tmpV
+.ENDIF ;; SAFE_CONTEXT
+
+    ;; if (abs(P2AH) < abs(P1AH)) {
+
+	lda _P1AH
+	bpl sortPoints_01_positiv_02
+	eor #$FF
+	clc
+	adc #1
+sortPoints_01_positiv_02:
+	sta tmp1
+
+	lda _P2AH
+	bpl sortPoints_01_positiv_01
+	eor #$FF
+	clc
+	adc #1
+sortPoints_01_positiv_01:
+
+	cmp tmp1
+	bcs sortPoints_step01
+
+    ;;     tmpH = P1AH;
+    ;;     tmpV = P1AV;
+    ;;     P1AH = P2AH;
+    ;;     P1AV = P2AV;
+    ;;     P2AH = tmpH;
+    ;;     P2AV = tmpV;
+	lda _P1AH
+	sta ptr1
+	lda _P1AV
+	sta ptr1+1
+	lda _P2AH
+	sta _P1AH
+	lda _P2AV
+	sta _P1AV
+	lda ptr1
+	sta _P2AH
+	lda ptr1+1
+	sta _P2AV
+
+
+    ;; }
+sortPoints_step01:	
+    ;; if (abs(P3AH) < abs(P1AH)) {
+
+	lda _P1AH
+	bpl sortPoints_02_positiv_02
+	eor #$FF
+	clc
+	adc #1
+sortPoints_02_positiv_02:
+	sta tmp1
+
+	lda _P3AH
+	bpl sortPoints_02_positiv_01
+	eor #$FF
+	clc
+	adc #1
+sortPoints_02_positiv_01:
+
+	cmp tmp1
+	bcs sortPoints_step02
+
+    ;;     tmpH = P1AH;
+    ;;     tmpV = P1AV;
+    ;;     P1AH = P3AH;
+    ;;     P1AV = P3AV;
+    ;;     P3AH = tmpH;
+    ;;     P3AV = tmpV;
+	lda _P1AH
+	sta ptr1
+	lda _P1AV
+	sta ptr1+1
+	lda _P3AH
+	sta _P1AH
+	lda _P3AV
+	sta _P1AV
+	lda ptr1
+	sta _P3AH
+	lda ptr1+1
+	sta _P3AV
+    ;; }
+sortPoints_step02:	
+    ;; if (abs(P3AH) < abs(P2AH)) {
+
+	lda _P2AH
+	bpl sortPoints_03_positiv_02
+	eor #$FF
+	clc
+	adc #1
+sortPoints_03_positiv_02:
+	sta tmp1
+
+	lda _P3AH
+	bpl sortPoints_03_positiv_01
+	eor #$FF
+	clc
+	adc #1
+sortPoints_03_positiv_01:
+
+	cmp tmp1
+	bcs sortPoints_done
+
+    ;;     tmpH = P2AH;
+    ;;     tmpV = P2AV;
+    ;;     P2AH = P3AH;
+    ;;     P2AV = P3AV;
+    ;;     P3AH = tmpH;
+    ;;     P3AV = tmpV;
+	lda _P2AH
+	sta ptr1
+	lda _P2AV
+	sta ptr1+1
+	lda _P3AH
+	sta _P2AH
+	lda _P3AV
+	sta _P2AV
+	lda ptr1
+	sta _P3AH
+	lda ptr1+1
+	sta _P3AV
+
+    ;; }
+
+sortPoints_done:	
+.IFDEF SAFE_CONTEXT
+
+	;; restore context
+	pla
+	sta ptr1+1
+	pla
+	sta ptr1
+	pla
+	sta tmp1
+	pla
+
+.ENDIF ;; SAFE_CONTEXT
+
+	rts
+
+.endproc
+.ENDIF ;; USE_ASM_SORTPOINTS
+
+
+
+
+
 ; .IFDEF USE_ASM_FUNCNAME
 ; .export _funcName
 
