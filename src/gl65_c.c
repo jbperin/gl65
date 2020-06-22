@@ -618,6 +618,7 @@ void bresStepType3() {
     }
 }
 
+#ifdef USE_C_ISA1RIGHT1
 void isA1Right1 (){
     
     A1Right = 0;
@@ -640,9 +641,18 @@ void isA1Right1 (){
         }
     }
 }
+#else
+extern void isA1Right1 ();
+#endif //USE_C_ISA1RIGHT1
+
+
+#ifdef USE_C_ISA1RIGHT3
 void isA1Right3 (){
  A1Right = (A1X > A2X);
 }
+#else
+extern void isA1Right3 ();
+#endif //USE_C_ISA1RIGHT3
 
 // #define USE_C_PREPAREBRESRUN
 #ifdef USE_C_PREPAREBRESRUN

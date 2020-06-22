@@ -1838,6 +1838,171 @@ prepare_bresrun_Lbresfill130:
 .ENDIF ;; USE_ASM_PREPAREBRESRUN
 
 
+USE_ASM_ISA1RIGHT1 = 1
+.IFDEF USE_ASM_ISA1RIGHT1
+.export _isA1Right1
+;; void isA1Right1()
+.proc _isA1Right1
+
+.IFDEF SAFE_CONTEXT
+	;; save context
+    pha
+	txa
+	pha
+	tya
+	pha
+	lda ptr2
+	pha
+	lda ptr2+1
+	pha
+	lda ptr1
+	pha
+	lda ptr1+1
+	pha
+.ENDIF ;; SAFE_CONTEXT
+    ;; if ((mDeltaX1 & 0x80) == 0){
+	lda #$00
+	sta _A1Right
+	lda _mDeltaX1
+	bmi isA1Right1_mDeltaX1_negativ
+        
+    ;; 	  if ((mDeltaX2 & 0x80) == 0){
+		lda _mDeltaX2
+		bmi isA1Right1_mDeltaX2_negativ_01
+    ;;         ;; printf ("%d*%d  %d*%d ", mDeltaY1, mDeltaX2, mDeltaY2,mDeltaX1);get ();
+    ;;         A1Right = (log2_tab[mDeltaX2] + log2_tab[mDeltaY1]) > (log2_tab[mDeltaX1] + log2_tab[mDeltaY2]);
+    ;;         ;; A1Right = mDeltaY1*mDeltaX2 > mDeltaY2*mDeltaX1;
+
+			ldx _mDeltaY1
+			ldy _mDeltaX2
+			clc
+			lda _log2_tab,x
+			adc _log2_tab,y
+			ror						; to avoid modulo by overflow
+			sta ptr2
+
+			ldx _mDeltaX1			; abs(mDeltaX1)
+			ldy _mDeltaY2
+			clc
+			lda _log2_tab,x
+			adc _log2_tab,y
+			ror						; to avoid modulo by overflow
+			sta ptr2+1			; (log2_tab[abs(mDeltaX1)] + log2_tab[mDeltaY2])
+
+			cmp ptr2
+
+			bcs isA1Right1_done
+
+			lda #$01
+			sta _A1Right
+
+			jmp isA1Right1_done
+isA1Right1_mDeltaX2_negativ_01:
+    ;;     } else {
+			lda #$0
+			sta _A1Right
+    ;;         A1Right = 0 ; ;; (mDeltaX1 < 0) 
+    ;;     }
+	jmp isA1Right1_done
+isA1Right1_mDeltaX1_negativ:
+    ;; } else {
+		eor #$ff
+		sec
+		adc #$00
+		sta ptr1 ; ptr1 = abs(mDeltaX1)
+ 
+    ;;     if ((mDeltaX2 & 0x80) == 0){
+		lda _mDeltaX2
+		bmi isA1Right1_mDeltaX2_negativ_02
+    ;;         A1Right = 1 ; ;; (mDeltaX1 < 0)
+			lda #$01
+			sta _A1Right
+			jmp isA1Right1_done
+ isA1Right1_mDeltaX2_negativ_02:
+    ;;     } else {
+    ;;         ;; printf ("%d*%d  %d*%d ", mDeltaY1, -mDeltaX2, mDeltaY2,-mDeltaX1);get ();
+			eor #$ff
+			sec
+			adc #$00
+			sta ptr1+1 ; ptr1+1 = abs(mDeltaX2)
+    ;;         A1Right = (log2_tab[abs(mDeltaX2)] + log2_tab[mDeltaY1]) < (log2_tab[abs(mDeltaX1)] + log2_tab[mDeltaY2]);
+
+			ldx ptr1+1			; abs(mDeltaX2)
+			ldy _mDeltaY1
+			clc
+			lda _log2_tab,x
+			adc _log2_tab,y
+			ror					; to avoid modulo by overflow
+			sta ptr2			; log2_tab[abs(mDeltaX2)] + log2_tab[mDeltaY1]
+
+			ldx ptr1			; abs(mDeltaX1)
+			ldy _mDeltaY2
+			clc
+			lda _log2_tab,x
+			adc _log2_tab,y
+			ror					; to avoid modulo by overflow
+			sta ptr2+1			; (log2_tab[abs(mDeltaX1)] + log2_tab[mDeltaY2])
+
+			cmp ptr2 
+
+			bcc isA1Right1_done
+
+			lda #$01
+			sta _A1Right
+
+    ;;     }
+    ;; }
+
+isA1Right1_done:
+.IFDEF SAFE_CONTEXT
+	;; restore context
+	pla
+	sta ptr1+1 
+	pla
+	sta ptr1 
+	pla
+	sta ptr2+1 
+	pla
+	sta ptr2 
+	pla
+	tay
+	pla
+	tax
+	pla
+.ENDIF ;; SAFE_CONTEXT
+
+	rts
+
+.endproc
+.ENDIF ;; USE_ASM_ISA1RIGHT1
+
+
+
+USE_ASM_ISA1RIGHT3 = 1
+.IFDEF USE_ASM_ISA1RIGHT3
+.export _isA1Right3
+;; void isA1Right3()
+.proc _isA1Right3
+
+	lda #$00
+	sta _A1Right
+
+	;; A1Right = (A1X > A2X);
+	lda _A2X
+	sec
+	sbc _A1X
+	bvc isA1Right3_skip_01
+	eor #$80
+isA1Right3_skip_01:
+	bpl isA1Right3_done
+
+	lda #$01
+	sta _A1Right
+isA1Right3_done:
+	rts
+.endproc
+.ENDIF ;; USE_ASM_ISA1RIGHT3
+
 
 
 ; .IFDEF USE_ASM_FUNCNAME
