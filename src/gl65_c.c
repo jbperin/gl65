@@ -331,6 +331,7 @@ void initSatur_A1Left() {
     }
 }
 
+#ifdef USE_C_SWITCHA1XSATUR
 void switch_A1XSatur(){
     if (A1XSatur == 0) {
         A1XSatur = 1;
@@ -338,9 +339,11 @@ void switch_A1XSatur(){
         A1XSatur = 0;
     }
 }
+#else
+extern void switch_A1XSatur();
+#endif
 
-
-
+#ifdef USE_C_SWITCHA2XSATUR
 void switch_A2XSatur(){
     if (A2XSatur == 0) {
         A2XSatur = 1;
@@ -348,7 +351,9 @@ void switch_A2XSatur(){
         A2XSatur = 0;
     }
 }
-
+#else
+extern void switch_A2XSatur();
+#endif
 
 void A1stepY_A1Right() {
     signed char nxtY, e2;

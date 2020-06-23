@@ -2003,7 +2003,27 @@ isA1Right3_done:
 .endproc
 .ENDIF ;; USE_ASM_ISA1RIGHT3
 
+USE_ASM_SWITCHA1XSATUR = 1
+.IFDEF USE_ASM_SWITCHA1XSATUR
+.export _switch_A1XSatur
+;; void switch_A1XSatur()
+.proc _switch_A1XSatur
+	lda _A1XSatur
+	eor #$01
+	sta _A1XSatur
+.endproc
+.ENDIF ;; USE_ASM_SWITCHA1XSATUR
 
+USE_ASM_SWITCHA2XSATUR = 1
+.IFDEF USE_ASM_SWITCHA2XSATUR
+.export _switch_A2XSatur
+;; void switch_A2XSatur()
+.proc _switch_A2XSatur
+	lda _A2XSatur
+	eor #$01
+	sta _A2XSatur
+.endproc
+.ENDIF ;; USE_ASM_SWITCHA2XSATUR
 
 ; .IFDEF USE_ASM_FUNCNAME
 ; .export _funcName
